@@ -1,0 +1,10 @@
+# комментарий
+Button	KEYWORD1
+
+getPinNumber	KEYWORD2
+checkClick	KEYWORD2
+checkHoldingClick	KEYWORD2
+setSingleMode	KEYWORD2
+setTriggerMode	KEYWORD2
+setHoldingMode	KEYWORD2
+setHoldingModeTime	KEYWORD2
