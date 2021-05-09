@@ -36,7 +36,7 @@ void Button::setTriggerMode()
 void Button::addHoldingMode() 
 {
 
-    holdingMode_ = 1;
+    isHoldingMode_ = 1;
 }
 
 void Button::setHoldingModeTime(int holdingTime) 
@@ -55,7 +55,7 @@ byte Button::checkClick()
             flag_ = 1;
             
             //запомнинаем значение таймера
-            if (isButtonPressed_ == 0 && holdingMode_) { 
+            if (isButtonPressed_ == 0 && isHoldingMode_) { 
                 holdingTimer_ = millis();
                 isButtonPressed_ = 1;
             }
@@ -67,14 +67,14 @@ byte Button::checkClick()
             flag_ = 0;
 
             //сбрасываем значение таймера на 0 в случае отпускания кнопки
-            if (holdingMode_) {
+            if (isHoldingMode_) {
                 holdingTimer_ = 0;
                 isButtonPressed_ = 0;
             }
             
         }
 
-        if (millis()-holdingTimer_ > holdingTime_ && flag_ == 1 && holdingMode_) 
+        if (millis()-holdingTimer_ > holdingTime_ && flag_ == 1 && isHoldingMode_) 
             return HOLDING_MODE_SIGNAL;
 
         return flag_;
@@ -88,7 +88,7 @@ byte Button::checkClick()
             trigger_ = !trigger_;
 
             //запомнинаем значение таймера
-            if (isButtonPressed_ == 0 && holdingMode_) { 
+            if (isButtonPressed_ == 0 && isHoldingMode_) { 
                 holdingTimer_ = millis();
                 isButtonPressed_ = 1;
             }
@@ -101,7 +101,7 @@ byte Button::checkClick()
             flag_ = 0;
 
             //сбрасываем значение таймера на 0 в случае отпускания кнопки
-            if (holdingMode_) {
+            if (isHoldingMode_) {
                 holdingTimer_ = 0;
                 isButtonPressed_ = 0;
             }
@@ -109,7 +109,7 @@ byte Button::checkClick()
         }
 
 
-        if (millis()-holdingTimer_ > holdingTime_ && flag_ == 1 && holdingMode_) 
+        if (millis()-holdingTimer_ > holdingTime_ && flag_ == 1 && isHoldingMode_) 
             return HOLDING_MODE_SIGNAL;
         
         
@@ -119,45 +119,6 @@ byte Button::checkClick()
 
     
     return ERROR_CODE;
-}
-
-boolean Button::checkHoldingClick()
-{
-    button_ = !digitalRead(pin_);
-    if (buttonMode_ == holdingMode_) 
-    {
-        if (button_ == 1 && flag_ == 0 && millis() - rattleTimer_ > rattleDelay_) {
-            
-            flag_ = 1;
-            
-            if (isButtonPressed_ == 0) {
-                holdingTimer_ = millis();
-                isButtonPressed_ = 1;
-            }
-        }
-        //restart function
-        if (button_ == 0 && flag_ == 1) {
-            
-            flag_ = 0;
-            
-            holdingTimer_ = 0;
-            isButtonPressed_ = 0;
-        }
-        
-        
-        if (millis()-holdingTimer_ > holdingTime_ && flag_ == 1) 
-            return 1;  
-        
-        else 
-            return 0;
-
-    }
-    else 
-    {
-        Serial.println("error: holding mode wasn't be set");
-        return 0;
-    }
-        
 }
 
 Button &Button::operator=(byte pin)

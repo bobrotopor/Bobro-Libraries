@@ -13,13 +13,13 @@ private:
     byte defaultPin_ = 2;
     byte pin_;
 
-    //
-    boolean button_;
-    byte buttonMode_;
-    boolean holdingMode_ = 0;
+    
+    boolean button_; //the data out of pin goes into this variable 
+    byte buttonMode_; //button mode: single or trigger
+    boolean isHoldingMode_ = 0;
 
     //timers
-    unsigned long rattleTimer_; //таймер против дребезга контактов
+    unsigned long rattleTimer_; //anti rattle timer - таймер против дребезга контактов
     unsigned long holdingTimer_;
     
     //time
