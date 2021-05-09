@@ -4,11 +4,13 @@ Button::Button()
 {
     pin_ = defaultPin_;
     pinMode(pin_, INPUT_PULLUP);
+    buttonMode_ = SINGLE_MODE;
 }
 Button::Button(byte pin) 
 {
     pin_ = pin;
     pinMode(pin_, INPUT_PULLUP);
+    buttonMode_ = SINGLE_MODE;
 }
 
 Button::~Button() 
@@ -24,17 +26,17 @@ byte Button::getPinNumber()
 void Button::setSingleMode()
 {
     flag_ = 0;
-    buttonMode_ = singleMode_;
+    buttonMode_ = SINGLE_MODE;
 }
 void Button::setTriggerMode()
 {
     flag_ = 0;
-    buttonMode_ = triggerMode_;
+    buttonMode_ = TRIGGER_MODE;
 }    
-void Button::setHoldingMode() 
+void Button::addHoldingMode() 
 {
-    flag_ = 0;
-    buttonMode_ = holdingMode_;
+
+    holdingMode_ = 1;
 }
 
 void Button::setHoldingModeTime(int holdingTime) 
@@ -42,44 +44,81 @@ void Button::setHoldingModeTime(int holdingTime)
     holdingTime_ = holdingTime;
 }
 
-boolean Button::checkClick()
+byte Button::checkClick()
 {
     
     button_ = !digitalRead(pin_);
-    if (buttonMode_ == singleMode_)
+    if (buttonMode_ == SINGLE_MODE)
     {
         if (button_ == 1 && flag_ == 0 && millis() - rattleTimer_ > rattleDelay_) {
             rattleTimer_ = millis();
             flag_ = 1;
             
+            //запомнинаем значение таймера
+            if (isButtonPressed_ == 0 && holdingMode_) { 
+                holdingTimer_ = millis();
+                isButtonPressed_ = 1;
+            }
+    
         }
             
         if (button_ == 0 && flag_ == 1) {
             
             flag_ = 0;
+
+            //сбрасываем значение таймера на 0 в случае отпускания кнопки
+            if (holdingMode_) {
+                holdingTimer_ = 0;
+                isButtonPressed_ = 0;
+            }
             
-        }    
+        }
+
+        if (millis()-holdingTimer_ > holdingTime_ && flag_ == 1 && holdingMode_) 
+            return HOLDING_MODE_SIGNAL;
 
         return flag_;
     }
 
-    if (buttonMode_ == triggerMode_)
+    if (buttonMode_ == TRIGGER_MODE)
     {
         if (button_ == 1 && flag_ == 0 && millis() - rattleTimer_ > rattleDelay_) {
             rattleTimer_ = millis();
             flag_ = 1;
             trigger_ = !trigger_;
+
+            //запомнинаем значение таймера
+            if (isButtonPressed_ == 0 && holdingMode_) { 
+                holdingTimer_ = millis();
+                isButtonPressed_ = 1;
+            }
+
+
         }
 
         if (button_ == 0 && flag_ == 1) {
             
             flag_ = 0;
+
+            //сбрасываем значение таймера на 0 в случае отпускания кнопки
+            if (holdingMode_) {
+                holdingTimer_ = 0;
+                isButtonPressed_ = 0;
+            }
             
         }
 
+
+        if (millis()-holdingTimer_ > holdingTime_ && flag_ == 1 && holdingMode_) 
+            return HOLDING_MODE_SIGNAL;
+        
+        
         return trigger_;
     }
-    return button_;
+
+
+    
+    return ERROR_CODE;
 }
 
 boolean Button::checkHoldingClick()
@@ -100,8 +139,9 @@ boolean Button::checkHoldingClick()
         if (button_ == 0 && flag_ == 1) {
             
             flag_ = 0;
+            
+            holdingTimer_ = 0;
             isButtonPressed_ = 0;
-
         }
         
         
@@ -120,19 +160,9 @@ boolean Button::checkHoldingClick()
         
 }
 
-//operators
-//void Button::operator = (byte pin);
+Button &Button::operator=(byte pin)
+{
+    this->pin_ = pin;
+    return *this;
+}
 
-
-
-// boolean Button::getTriggerValue() 
-// {
-//     if (buttonMode_ == singleMode_)
-//     {
-//         return button_;
-//     }
-//     if (buttonMode_ == triggerMode_)
-//     {
-//         return button_;
-//     }
-// }
