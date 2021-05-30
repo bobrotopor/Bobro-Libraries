@@ -1,2 +1,2 @@
 # Bobro-Libraries
-This repository contains the libraries I wrote
+This repository contains the libraries that I wrote
